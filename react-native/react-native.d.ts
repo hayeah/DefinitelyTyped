@@ -3331,8 +3331,20 @@ declare namespace  __React {
         vibrate(): void
     }
 
+    export type AnimatedValue = Animated.Animated;
+    type AnimatedValueXY = Animated.ValueXY;
+
     export module Animated {
-      type Property = Value | AnimatedInterpolation;
+      // Most (all?) functions where AnimatedValue is used any subclass of Animated can be used as well.
+
+      class Animated {
+        // Internal class, no public API.
+      }
+
+      class AnimatedWithChildren extends Animated {
+        // Internal class, no public API.
+      }
+
 
       type ExtrapolateType = 'extend' | 'identity' | 'clamp';
 
@@ -3353,7 +3365,7 @@ declare namespace  __React {
        * mechanism at a time.  Using a new mechanism (e.g. starting a new animation,
        * or calling `setValue`) will stop any previous ones.
        */
-      export class Value {
+      export class Value extends AnimatedWithChildren {
         constructor(value: number);
 
         setValue(value: number): void;
@@ -3396,8 +3408,6 @@ declare namespace  __React {
         interpolate(config: InterpolationConfigType): AnimatedInterpolation;
       }
 
-      type AnimatedValue = Value;
-
       type ValueXYListenerCallback = (value: {x: number; y: number}) => void;
 
       /**
@@ -3405,7 +3415,7 @@ declare namespace  __React {
        * API to normal `Animated.Value`, but multiplexed.  Contains two regular
        * `Animated.Value`s under the hood.
        */
-      export class ValueXY {
+      export class ValueXY extends AnimatedWithChildren {
         x: AnimatedValue;
         y: AnimatedValue;
 
@@ -3443,16 +3453,6 @@ declare namespace  __React {
          */
         getTranslateTransform(): {[key: string]: AnimatedValue}[];
 
-      }
-
-      type AnimatedValueXY = ValueXY;
-
-      class Animated {
-        // Internal class, no public API.
-      }
-
-      class AnimatedWithChildren extends Animated {
-        // Internal class, no public API.
       }
 
       class AnimatedInterpolation extends AnimatedWithChildren {
