@@ -3698,7 +3698,7 @@ declare module "react-native" {
         easing?: (value: number) => number;
         duration?: number;
         delay?: number;
-      };
+      }
 
       /**
        * Animates a value along a timed easing curve.  The `Easing` module has tons
@@ -3719,7 +3719,7 @@ declare module "react-native" {
         speed?: number;
         tension?: number;
         friction?: number;
-      };
+      }
 
       /**
        * Spring animation based on Rebound and Origami.  Tracks velocity state to
@@ -3747,7 +3747,7 @@ declare module "react-native" {
       type Mapping = {[key: string]: Mapping} | AnimatedValue;
       interface EventConfig {
         listener?: Function
-      };
+      }
 
       /**
        *  Takes an array of mappings and extracts values from each arg accordingly,
