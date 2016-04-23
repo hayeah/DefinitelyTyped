@@ -3459,6 +3459,11 @@ declare module "react-native" {
     export module Animated {
       // Most (all?) functions where AnimatedValue is used any subclass of Animated can be used as well.
 
+      type AnimatedValue = Animated;
+      type AnimatedValueXY = ValueXY;
+
+      type Base = Animated;
+
       class Animated {
         // Internal class, no public API.
       }
@@ -3467,6 +3472,9 @@ declare module "react-native" {
         // Internal class, no public API.
       }
 
+      class AnimatedInterpolation extends AnimatedWithChildren {
+        interpolate(config: InterpolationConfigType): AnimatedInterpolation;
+      }
 
       type ExtrapolateType = 'extend' | 'identity' | 'clamp';
 
@@ -3543,9 +3551,9 @@ declare module "react-native" {
 
         constructor(valueIn?: {x: number | AnimatedValue; y: number | AnimatedValue});
 
-        setValue(value: {x: number; y: number});
+        setValue(value: {x: number; y: number}): void;
 
-        setOffset(offset: {x: number; y: number});
+        setOffset(offset: {x: number; y: number}): void;
 
         flattenOffset(): void
 
@@ -3577,10 +3585,6 @@ declare module "react-native" {
 
       }
 
-      class AnimatedInterpolation extends AnimatedWithChildren {
-        interpolate(config: InterpolationConfigType): AnimatedInterpolation;
-      }
-
       type EndResult = {finished: boolean};
       type EndCallback = (result: EndResult) => void;
 
@@ -3594,11 +3598,18 @@ declare module "react-native" {
         useNativeDriver?: boolean;
       }
 
-      interface TimingAnimationConfig extends AnimationConfig {
-        toValue: number | AnimatedValue | {x: number, y: number} | AnimatedValueXY;
-        easing?: (value: number) => number;
-        duration?: number;
-        delay?: number;
+      /**
+       * Animates a value from an initial velocity to zero based on a decay
+       * coefficient.
+       */
+      export function decay(
+        value: AnimatedValue | AnimatedValueXY,
+        config: DecayAnimationConfig
+      ): CompositeAnimation;
+
+      interface DecayAnimationConfig extends AnimationConfig {
+        velocity: number | {x: number, y: number};
+        deceleration?: number;
       }
 
       /**
@@ -3609,6 +3620,13 @@ declare module "react-native" {
         value: AnimatedValue | AnimatedValueXY,
         config: TimingAnimationConfig
       ) => CompositeAnimation;
+
+      interface TimingAnimationConfig extends AnimationConfig {
+        toValue: number | AnimatedValue | {x: number, y: number} | AnimatedValueXY;
+        easing?: (value: number) => number;
+        duration?: number;
+        delay?: number;
+      }
 
       interface SpringAnimationConfig extends AnimationConfig {
         toValue: number | AnimatedValue | {x: number, y: number} | AnimatedValueXY;
@@ -3621,6 +3639,63 @@ declare module "react-native" {
         tension?: number;
         friction?: number;
       }
+
+      /**
+       * Creates a new Animated value composed from two Animated values added
+       * together.
+       */
+      export function add(
+        a: Animated,
+        b: Animated
+      ): AnimatedAddition;
+
+      class AnimatedAddition extends AnimatedInterpolation {}
+
+      /**
+       * Creates a new Animated value composed from two Animated values multiplied
+       * together.
+       */
+       export function multiply(
+        a: Animated,
+        b: Animated
+      ): AnimatedMultiplication;
+
+      class AnimatedMultiplication extends AnimatedInterpolation {}
+
+      /**
+       * Creates a new Animated value that is the (non-negative) modulo of the
+       * provided Animated value
+       */
+      export function modulo(
+        a: Animated,
+        modulus: number
+      ): AnimatedModulo;
+
+      class AnimatedModulo extends AnimatedInterpolation {}
+
+      /**
+       * Starts an animation after the given delay.
+       */
+      export function delay(time: number): CompositeAnimation;
+
+      /**
+       * Starts an array of animations in order, waiting for each to complete
+       * before starting the next.  If the current running animation is stopped, no
+       * following animations will be started.
+       */
+      export function sequence(
+        animations: Array<CompositeAnimation>
+      ): CompositeAnimation;
+
+      /**
+       * Array of animations may run in parallel (overlap), but are started in
+       * sequence with successive delays.  Nice for doing trailing effects.
+       */
+
+      export function stagger(
+        time: number,
+        animations: Array<CompositeAnimation>
+      ): CompositeAnimation
 
       /**
        * Spring animation based on Rebound and Origami.  Tracks velocity state to
