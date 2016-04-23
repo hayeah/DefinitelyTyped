@@ -27,8 +27,12 @@ import {
     View,
     AppState,
     AppStateIOS,
-    ViewPagerAndroid
+    ViewPagerAndroid,
+    BackAndroid,
 } from 'react-native';
+
+BackAndroid.addEventListener("hardwareBackPress", () => {
+});
 
 var styles = StyleSheet.create(
     {
