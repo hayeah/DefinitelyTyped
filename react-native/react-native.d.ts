@@ -3680,6 +3680,14 @@ declare module "react-native" {
       export var Text: any;
     }
 
+    export namespace BackAndroid {
+      type EVENT_NAME = "hardwareBackPress";
+
+      export function exitApp();
+      export function addEventListener(event: EVENT_NAME, Function);
+      export function removeEventListener(event: EVENT_NAME, Function);
+    }
+
     //////////////////////////////////////////////////////////////////////////
     //
     //  R E - E X P O R T S
